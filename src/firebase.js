@@ -3,13 +3,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBOfZC63BYO6_cp9SwWgNvyTiBBNUNbn4o",
-  authDomain: "khaiplearn-e95a5.firebaseapp.com",
-  projectId: "khaiplearn-e95a5",
-  storageBucket: "khaiplearn-e95a5.firebasestorage.app",
-  messagingSenderId: "959448605499",
-  appId: "1:959448605499:web:736ea48173ffdb3197cd1e",
-  measurementId: "G-65Y1SFJYTE",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
