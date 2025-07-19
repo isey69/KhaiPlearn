@@ -2,18 +2,33 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
-import { Sparkles, Gift, UserPlus, History } from "lucide-react";
+import {
+  Sparkles,
+  Gift,
+  UserPlus,
+  History,
+  ShoppingCart,
+  Settings,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 const HomePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 p-4 text-white flex flex-col justify-start font-sans">
       {/* Header */}
-      <header className="text-center my-8">
+      <header className="text-center my-8 relative">
         <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-300 to-pink-400 text-transparent bg-clip-text animate-pulse">
           PointsMagic ✨
         </h1>
         <p className="text-purple-200 mt-2">สะสมแต้ม แลกรางวัลสุดฟิน!</p>
+        <Link to="/profile" className="absolute top-0 right-0">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <UserPlus
+              className="text-white bg-white/10 p-2 rounded-full"
+              size={40}
+            />
+          </motion.div>
+        </Link>
       </header>
 
       {/* Hero Section */}
@@ -62,7 +77,7 @@ const HomePage = () => {
           gradient="from-yellow-400 to-orange-500"
         />
         <ActionCard
-          to="/AddMember"
+          to="/add-member"
           icon={<UserPlus size={40} />}
           text="เพิ่มสมาชิก"
           description="ลงทะเบียนลูกค้าใหม่"
@@ -78,9 +93,11 @@ const HomePage = () => {
         className="fixed bottom-0 left-0 right-0 p-4"
       >
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-4 flex justify-around items-center text-white shadow-2xl max-w-sm mx-auto">
-          <BottomNavItem text="หน้าแรก" icon={<History />} active />
-          <BottomNavItem text="ประวัติ" icon={<History />} />
-          <BottomNavItem text="โปรไฟล์" icon={<UserPlus />} />
+          <BottomNavItem to="/" text="หน้าแรก" icon={<History />} active />
+          <BottomNavItem to="/sales" text="ขาย" icon={<ShoppingCart />} />
+          <BottomNavItem to="/history" text="ประวัติ" icon={<History />} />
+          <BottomNavItem to="/profile" text="โปรไฟล์" icon={<UserPlus />} />
+          <BottomNavItem to="/settings" text="ตั้งค่า" icon={<Settings />} />
         </div>
       </motion.div>
     </div>
@@ -101,8 +118,8 @@ const ActionCard = ({ to, icon, text, description, gradient }) => (
   </Link>
 );
 
-const BottomNavItem = ({ icon, text, active = false }) => (
-  <div className="flex flex-col items-center gap-1">
+const BottomNavItem = ({ to, icon, text, active = false }) => (
+  <Link to={to} className="flex flex-col items-center gap-1">
     <div className={`${active ? "text-yellow-300" : "text-purple-300"}`}>
       {icon}
     </div>
@@ -113,7 +130,7 @@ const BottomNavItem = ({ icon, text, active = false }) => (
     >
       {text}
     </span>
-  </div>
+  </Link>
 );
 
 export default HomePage;
