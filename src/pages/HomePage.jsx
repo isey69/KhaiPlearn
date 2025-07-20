@@ -77,7 +77,7 @@ const HomePage = () => {
           gradient="from-yellow-400 to-orange-500"
         />
         <ActionCard
-          to="/add-member"
+          to="/AddMember"
           icon={<UserPlus size={40} />}
           text="เพิ่มสมาชิก"
           description="ลงทะเบียนลูกค้าใหม่"
