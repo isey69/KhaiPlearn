@@ -19,6 +19,8 @@ const HistoryPage = () => {
   const [history, setHistory] = useState([]);
   const [message, setMessage] = useState("");
   const [searched, setSearched] = useState(false);
+  const [viewMode, setViewMode] = useState("sales"); // 'sales' or 'rewards'
+  const [filter, setFilter] = useState({ dateRange: "", category: "", member: "" });
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -48,18 +50,43 @@ const HistoryPage = () => {
     }
   };
 
+  useEffect(() => {
+    fetchHistory(member ? member.id : null);
+  }, [viewMode, filter, member]);
+
   const fetchHistory = async (memberId) => {
     try {
-      const q = query(
+      let q = query(
         collection(db, "transactions"),
-        where("memberId", "==", memberId),
         orderBy("createdAt", "desc")
       );
+
+      if (memberId) {
+        q = query(q, where("memberId", "==", memberId));
+      }
+
+      if (viewMode === 'sales') {
+        q = query(q, where("type", "==", "sale"));
+      } else {
+        q = query(q, where("type", "==", "redeem"));
+      }
+
       const querySnapshot = await getDocs(q);
-      const historyData = querySnapshot.docs.map((doc) => ({
+      let historyData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+
+      if (filter.dateRange) {
+        // Implement date range filtering logic here
+      }
+      if (filter.category) {
+        // Implement category filtering logic here
+      }
+      if (filter.member) {
+        // Implement member filtering logic here
+      }
+
       setHistory(historyData);
     } catch (error) {
       console.error("Error fetching history:", error);
@@ -122,20 +149,55 @@ const HistoryPage = () => {
           </motion.p>
         )}
 
-        {member && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+        <div className="flex justify-center gap-4 mb-8">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode("sales")}
+            className={`py-2 px-6 rounded-full font-bold ${
+              viewMode === "sales"
+                ? "bg-cyan-400 text-white"
+                : "bg-white/20 text-cyan-300"
+            }`}
           >
-            <div className="bg-white/20 p-6 rounded-3xl shadow-2xl mb-8 text-center backdrop-blur-lg">
-              <h2 className="text-2xl font-bold">{member.name}</h2>
-              <p className="text-4xl font-bold my-2 text-yellow-300 flex items-center justify-center gap-2">
-                <Star className="animate-pulse" /> {member.points || 0}
-              </p>
-              <p className="text-blue-200">แต้มสะสม</p>
-            </div>
+            Sales History
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode("rewards")}
+            className={`py-2 px-6 rounded-full font-bold ${
+              viewMode === "rewards"
+                ? "bg-cyan-400 text-white"
+                : "bg-white/20 text-cyan-300"
+            }`}
+          >
+            Rewards History
+          </motion.button>
+        </div>
 
-            <div className="space-y-4">
+        <div className="bg-white/10 p-4 rounded-3xl shadow-lg mb-8">
+          <h3 className="font-bold text-lg mb-2">Filters</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Date Range (not implemented)"
+              className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+            />
+            <input
+              type="text"
+              placeholder="Category (not implemented)"
+              className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+            />
+            <input
+              type="text"
+              placeholder="Member (not implemented)"
+              className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
               {history.length > 0 ? (
                 history.map((item, index) => (
                   <motion.div

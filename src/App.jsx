@@ -9,6 +9,8 @@ import HistoryPage from "./pages/History";
 import ProfilePage from "./pages/Profile";
 import SalesPage from "./pages/Sales";
 import PointsSettingsPage from "./pages/Settings/Points";
+import RewardsSettingsPage from "./pages/Settings/Rewards";
+import ProductsSettingsPage from "./pages/Settings/Products";
 import SettingsPage from "./pages/Settings";
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/sales" element={<SalesPage />} />
         <Route path="/settings/points" element={<PointsSettingsPage />} />
+        <Route path="/settings/rewards" element={<RewardsSettingsPage />} />
+        <Route path="/settings/products" element={<ProductsSettingsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </Router>

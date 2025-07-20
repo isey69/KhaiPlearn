@@ -41,20 +41,7 @@ const HomePage = () => {
           <CardContent className="p-6">
             <h2 className="text-2xl font-bold mb-2">🎉 ยินดีต้อนรับ!</h2>
             <p className="mb-4 text-lg">
-              คุณมี{" "}
-              <span className="font-bold text-yellow-300 text-2xl">820</span>{" "}
-              แต้มสะสม
-            </p>
-            <div className="relative pt-1">
-              <div className="overflow-hidden h-4 mb-2 text-xs flex rounded-full bg-purple-800/50">
-                <div
-                  style={{ width: "82%" }}
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-green-400 to-blue-500 animate-pulse"
-                ></div>
-              </div>
-            </div>
-            <p className="text-xs mt-2 text-purple-200">
-              เหลืออีก 180 แต้ม สำหรับของรางวัลชิ้นถัดไป! 🎁
+              Welcome to PointsMagic!
             </p>
           </CardContent>
         </Card>
