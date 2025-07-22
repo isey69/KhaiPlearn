@@ -6,12 +6,27 @@ import { UserPlus, ArrowLeft, Cake, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+import { getDocs } from "firebase/firestore";
+
 function AddMember() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [birthday, setBirthday] = useState("");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [filter, setFilter] = useState({ name: "", phone: "" });
+
+  const fetchMembers = async () => {
+    const membersCollection = collection(db, "members");
+    const membersSnapshot = await getDocs(membersCollection);
+    const membersList = membersSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setMembers(membersList);
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -117,6 +132,71 @@ function AddMember() {
           >
             {message}
           </motion.div>
+        )}
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            setShowMembers(!showMembers);
+            if (!showMembers) {
+              fetchMembers();
+            }
+          }}
+          className="w-full mt-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-3xl text-white font-bold shadow-xl text-lg"
+        >
+          {showMembers ? "Hide Members" : "View All Members"}
+        </motion.button>
+
+        {showMembers && (
+          <div className="mt-8">
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <input
+                type="text"
+                placeholder="Filter by name"
+                value={filter.name}
+                onChange={(e) => setFilter({ ...filter, name: e.target.value })}
+                className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+              />
+              <input
+                type="text"
+                placeholder="Filter by phone"
+                value={filter.phone}
+                onChange={(e) =>
+                  setFilter({ ...filter, phone: e.target.value })
+                }
+                className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+              />
+            </div>
+            <div className="bg-white/10 p-4 rounded-3xl shadow-lg">
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th className="p-2">Name</th>
+                    <th className="p-2">Phone</th>
+                    <th className="p-2">Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members
+                    .filter(
+                      (member) =>
+                        member.name
+                          .toLowerCase()
+                          .includes(filter.name.toLowerCase()) &&
+                        member.phone.includes(filter.phone)
+                    )
+                    .map((member) => (
+                      <tr key={member.id}>
+                        <td className="p-2">{member.name}</td>
+                        <td className="p-2">{member.phone}</td>
+                        <td className="p-2">{member.points}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
     </div>

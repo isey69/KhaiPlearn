@@ -9,6 +9,8 @@ import {
   History,
   ShoppingCart,
   Settings,
+  BarChart2,
+  Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -18,9 +20,9 @@ const HomePage = () => {
       {/* Header */}
       <header className="text-center my-8 relative">
         <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-300 to-pink-400 text-transparent bg-clip-text animate-pulse">
-          PointsMagic ✨
+          SunFight ✨
         </h1>
-        <p className="text-purple-200 mt-2">สะสมแต้ม แลกรางวัลสุดฟิน!</p>
+        <p className="text-purple-200 mt-2">By komchalatPOS</p>
         <Link to="/profile" className="absolute top-0 right-0">
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <UserPlus
@@ -30,35 +32,6 @@ const HomePage = () => {
           </motion.div>
         </Link>
       </header>
-
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 50, rotate: -5 }}
-        animate={{ opacity: 1, y: 0, rotate: 0 }}
-        transition={{ type: "spring", stiffness: 50 }}
-      >
-        <Card className="rounded-3xl shadow-xl bg-white/20 backdrop-blur-lg border-none text-white mb-8 transform hover:scale-105 transition-transform duration-300">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold mb-2">🎉 ยินดีต้อนรับ!</h2>
-            <p className="mb-4 text-lg">
-              คุณมี{" "}
-              <span className="font-bold text-yellow-300 text-2xl">820</span>{" "}
-              แต้มสะสม
-            </p>
-            <div className="relative pt-1">
-              <div className="overflow-hidden h-4 mb-2 text-xs flex rounded-full bg-purple-800/50">
-                <div
-                  style={{ width: "82%" }}
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-green-400 to-blue-500 animate-pulse"
-                ></div>
-              </div>
-            </div>
-            <p className="text-xs mt-2 text-purple-200">
-              เหลืออีก 180 แต้ม สำหรับของรางวัลชิ้นถัดไป! 🎁
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
 
       {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-auto">
@@ -77,11 +50,11 @@ const HomePage = () => {
           gradient="from-yellow-400 to-orange-500"
         />
         <ActionCard
-          to="/AddMember"
-          icon={<UserPlus size={40} />}
-          text="เพิ่มสมาชิก"
-          description="ลงทะเบียนลูกค้าใหม่"
-          gradient="from-pink-500 to-purple-600"
+          to="/sales"
+          icon={<ShoppingCart size={40} />}
+          text="Go to Sales"
+          description="Start a new sale"
+          gradient="from-blue-500 to-green-500"
         />
       </div>
 
@@ -93,11 +66,22 @@ const HomePage = () => {
         className="fixed bottom-0 left-0 right-0 p-4"
       >
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-4 flex justify-around items-center text-white shadow-2xl max-w-sm mx-auto">
-          <BottomNavItem to="/" text="หน้าแรก" icon={<History />} active />
-          <BottomNavItem to="/sales" text="ขาย" icon={<ShoppingCart />} />
-          <BottomNavItem to="/history" text="ประวัติ" icon={<History />} />
-          <BottomNavItem to="/profile" text="โปรไฟล์" icon={<UserPlus />} />
-          <BottomNavItem to="/settings" text="ตั้งค่า" icon={<Settings />} />
+          <BottomNavItem to="/" text="Home" icon={<History />} active />
+          <BottomNavItem to="/sales" text="Sales" icon={<ShoppingCart />} />
+          <BottomNavItem to="/history" text="History" icon={<History />} />
+          <BottomNavItem
+            to="/AddMember"
+            text="Add Member"
+            icon={<UserPlus />}
+          />
+          <BottomNavItem to="/profile" text="Profile" icon={<UserPlus />} />
+          <BottomNavItem to="/settings" text="Settings" icon={<Settings />} />
+          <BottomNavItem to="/summary" text="Summary" icon={<BarChart2 />} />
+          <BottomNavItem
+            to="/loyal-customers"
+            text="Loyal Customers"
+            icon={<Users />}
+          />
         </div>
       </motion.div>
     </div>
