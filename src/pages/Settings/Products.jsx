@@ -18,6 +18,7 @@ const ProductsSettingsPage = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState("");
+  const [status, setStatus] = useState("Active");
   const [editingProduct, setEditingProduct] = useState(null);
 
   const productsCollectionRef = collection(db, "products");
@@ -36,10 +37,12 @@ const ProductsSettingsPage = () => {
         name,
         price: Number(price),
         category,
+        status,
       });
       setName("");
       setPrice(0);
       setCategory("");
+      setStatus("Active");
       // Refresh products
       const data = await getDocs(productsCollectionRef);
       setProducts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
@@ -49,11 +52,17 @@ const ProductsSettingsPage = () => {
   const handleUpdateProduct = async (id) => {
     if (name && price > 0 && category) {
       const productDoc = doc(db, "products", id);
-      await updateDoc(productDoc, { name, price: Number(price), category });
+      await updateDoc(productDoc, {
+        name,
+        price: Number(price),
+        category,
+        status,
+      });
       setEditingProduct(null);
       setName("");
       setPrice(0);
       setCategory("");
+      setStatus("Active");
       // Refresh products
       const data = await getDocs(productsCollectionRef);
       setProducts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
@@ -73,6 +82,16 @@ const ProductsSettingsPage = () => {
     setName(product.name);
     setPrice(product.price);
     setCategory(product.category);
+    setStatus(product.status);
+  };
+
+  const toggleProductStatus = async (product) => {
+    const productDoc = doc(db, "products", product.id);
+    const newStatus = product.status === "Active" ? "Inactive" : "Active";
+    await updateDoc(productDoc, { status: newStatus });
+    // Refresh products
+    const data = await getDocs(productsCollectionRef);
+    setProducts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
   };
 
   return (
@@ -122,6 +141,14 @@ const ProductsSettingsPage = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
+            <select
+              className="w-full px-4 py-3 bg-white/10 rounded-2xl placeholder-blue-300 text-white focus:outline-none focus:ring-2 focus:ring-cyan-300"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -156,6 +183,18 @@ const ProductsSettingsPage = () => {
                 </p>
               </div>
               <div className="flex gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => toggleProductStatus(product)}
+                  className={`p-2 rounded-full ${
+                    product.status === "Active"
+                      ? "bg-green-500/50"
+                      : "bg-red-500/50"
+                  }`}
+                >
+                  {product.status === "Active" ? "Active" : "Inactive"}
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}

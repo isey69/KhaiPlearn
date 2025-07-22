@@ -8,21 +8,99 @@ import {
   Search,
   TrendingUp,
   TrendingDown,
-  Star,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useCallback } from "react";
 
 const HistoryPage = () => {
   const [phone, setPhone] = useState("");
   const [member, setMember] = useState(null);
   const [history, setHistory] = useState([]);
+  const [members, setMembers] = useState({});
   const [message, setMessage] = useState("");
-  const [searched, setSearched] = useState(false);
+  const [viewMode, setViewMode] = useState("sales"); // 'sales' or 'rewards'
+  const [filter] = useState({ dateRange: "", category: "", member: "" });
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      const membersCollection = collection(db, "members");
+      const membersSnapshot = await getDocs(membersCollection);
+      const membersData = {};
+      membersSnapshot.forEach((doc) => {
+        membersData[doc.id] = doc.data();
+      });
+      setMembers(membersData);
+    };
+    fetchMembers();
+  }, []);
+
+  const fetchHistory = useCallback(
+    async (memberId) => {
+      try {
+        let q = query(
+          collection(db, "transactions"),
+          orderBy("createdAt", "desc")
+        );
+
+        if (memberId) {
+          q = query(q, where("memberId", "==", memberId));
+        }
+
+        if (viewMode === "sales") {
+          q = query(q, where("type", "==", "sale"));
+        } else {
+          q = query(q, where("type", "==", "redeem"));
+        }
+
+        const querySnapshot = await getDocs(q);
+        let historyData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        if (viewMode === "sales") {
+          const unpaidDebtsQuery = query(
+            collection(db, "unpaidDebts"),
+            where("status", "==", "paid"),
+            where("customerId", "==", memberId)
+          );
+          const unpaidDebtsSnapshot = await getDocs(unpaidDebtsQuery);
+          const unpaidDebtsData = unpaidDebtsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            type: "sale",
+            details: `Paid debt: ${doc
+              .data()
+              .items.map((item) => item.name)
+              .join(", ")}`,
+            points: doc.data().total,
+          }));
+          historyData = [...historyData, ...unpaidDebtsData];
+          historyData.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+        }
+
+        if (filter.dateRange) {
+          // Implement date range filtering logic here
+        }
+        if (filter.category) {
+          // Implement category filtering logic here
+        }
+        if (filter.member) {
+          // Implement member filtering logic here
+        }
+
+        setHistory(historyData);
+      } catch (error) {
+        console.error("Error fetching history:", error);
+        setMessage("เกิดข้อผิดพลาดในการดึงข้อมูลประวัติ 📜");
+      }
+    },
+    [viewMode, filter]
+  );
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    setSearched(true);
     setMember(null);
     setHistory([]);
     setMessage("");
@@ -48,24 +126,9 @@ const HistoryPage = () => {
     }
   };
 
-  const fetchHistory = async (memberId) => {
-    try {
-      const q = query(
-        collection(db, "transactions"),
-        where("memberId", "==", memberId),
-        orderBy("createdAt", "desc")
-      );
-      const querySnapshot = await getDocs(q);
-      const historyData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setHistory(historyData);
-    } catch (error) {
-      console.error("Error fetching history:", error);
-      setMessage("เกิดข้อผิดพลาดในการดึงข้อมูลประวัติ 📜");
-    }
-  };
+  useEffect(() => {
+    fetchHistory(member ? member.id : null);
+  }, [member, fetchHistory]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-blue-700 p-4 text-white font-sans">
@@ -122,33 +185,82 @@ const HistoryPage = () => {
           </motion.p>
         )}
 
-        {member && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+        <div className="flex justify-center gap-4 mb-8">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode("sales")}
+            className={`py-2 px-6 rounded-full font-bold ${
+              viewMode === "sales"
+                ? "bg-cyan-400 text-white"
+                : "bg-white/20 text-cyan-300"
+            }`}
           >
-            <div className="bg-white/20 p-6 rounded-3xl shadow-2xl mb-8 text-center backdrop-blur-lg">
-              <h2 className="text-2xl font-bold">{member.name}</h2>
-              <p className="text-4xl font-bold my-2 text-yellow-300 flex items-center justify-center gap-2">
-                <Star className="animate-pulse" /> {member.points || 0}
-              </p>
-              <p className="text-blue-200">แต้มสะสม</p>
-            </div>
+            Sales History
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setViewMode("rewards")}
+            className={`py-2 px-6 rounded-full font-bold ${
+              viewMode === "rewards"
+                ? "bg-cyan-400 text-white"
+                : "bg-white/20 text-cyan-300"
+            }`}
+          >
+            Rewards History
+          </motion.button>
+        </div>
 
-            <div className="space-y-4">
-              {history.length > 0 ? (
-                history.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: -25 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: index * 0.1,
-                      type: "spring",
-                      stiffness: 150,
-                    }}
-                    className={`p-4 rounded-3xl shadow-xl flex items-center space-x-4 bg-white/10 backdrop-blur-md`}
-                  >
+        <div className="bg-white/10 p-4 rounded-3xl shadow-lg mb-8">
+          <h3 className="font-bold text-lg mb-2">Filters</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Date Range (not implemented)"
+              className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+            />
+            <input
+              type="text"
+              placeholder="Category (not implemented)"
+              className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+            />
+            <input
+              type="text"
+              placeholder="Member (not implemented)"
+              className="w-full px-4 py-2 bg-white/10 rounded-xl placeholder-blue-300"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {history.length > 0 ? (
+            history.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, x: -25 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 150,
+                }}
+                className={`p-4 rounded-3xl shadow-xl flex items-center space-x-4 bg-white/10 backdrop-blur-md`}
+              >
+                {viewMode === "sales" ? (
+                  <>
+                    <div className="flex-grow">
+                      <p className="font-bold">
+                        {members[item.memberId]?.name}
+                      </p>
+                      <p className="text-sm">{item.details}</p>
+                    </div>
+                    <p className="font-bold text-xl ml-auto text-green-300">
+                      {item.points} THB
+                    </p>
+                  </>
+                ) : (
+                  <>
                     <div
                       className={`p-3 rounded-full ${
                         item.type === "accumulate"
@@ -163,7 +275,10 @@ const HistoryPage = () => {
                       )}
                     </div>
                     <div className="flex-grow">
-                      <p className="font-bold">{item.details}</p>
+                      <p className="font-bold">
+                        {members[item.memberId]?.name}
+                      </p>
+                      <p>{item.details}</p>
                       <p className="text-xs text-blue-200">
                         {new Date(
                           item.createdAt.seconds * 1000
@@ -181,16 +296,16 @@ const HistoryPage = () => {
                         ? `+${item.points}`
                         : `-${item.points}`}
                     </p>
-                  </motion.div>
-                ))
-              ) : (
-                <p className="text-center bg-white/10 p-6 rounded-3xl font-semibold">
-                  ไม่มีประวัติ 😢
-                </p>
-              )}
-            </div>
-          </motion.div>
-        )}
+                  </>
+                )}
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-center bg-white/10 p-6 rounded-3xl font-semibold">
+              No history found.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

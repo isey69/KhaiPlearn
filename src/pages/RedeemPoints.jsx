@@ -1,5 +1,5 @@
 // src/pages/RedeemPoints.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../firebase.js";
 import {
   collection,
@@ -14,35 +14,27 @@ import { Gift, ArrowLeft, Search, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const rewards = [
-  {
-    name: "ส่วนลด 50 บาท 💰",
-    points: 500,
-    gradient: "from-green-400 to-blue-500",
-  },
-  {
-    name: "เครื่องดื่มฟรี 🥤",
-    points: 800,
-    gradient: "from-pink-500 to-purple-600",
-  },
-  {
-    name: "ของหวานฟรี 🍰",
-    points: 1000,
-    gradient: "from-yellow-400 to-orange-500",
-  },
-  {
-    name: "เสื้อยืดสุดเท่ 👕",
-    points: 2500,
-    gradient: "from-teal-400 to-cyan-600",
-  },
-];
-
 const RedeemPoints = () => {
+  const [rewards, setRewards] = useState([]);
   const [phone, setPhone] = useState("");
   const [member, setMember] = useState(null);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    const fetchRewards = async () => {
+      const rewardsCollection = collection(db, "rewards");
+      const rewardsSnapshot = await getDocs(rewardsCollection);
+      const rewardsList = rewardsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setRewards(rewardsList);
+    };
+
+    fetchRewards();
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();

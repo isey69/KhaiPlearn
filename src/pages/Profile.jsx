@@ -32,13 +32,13 @@ const ProfilePage = () => {
           className="bg-white/10 p-8 rounded-3xl shadow-2xl backdrop-blur-lg"
         >
           <div className="space-y-6">
-            <InfoRow icon={<User />} label="Name" value="Jules Verne" />
+            <InfoRow icon={<User />} label="Name" value="Anonymous" />
             <InfoRow
               icon={<Mail />}
               label="Email"
-              value="jules.v@example.com"
+              value="anonymous@example.com"
             />
-            <InfoRow icon={<Award />} label="Points" value="2,345" />
+            <InfoRow icon={<Award />} label="Points" value="0" />
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}

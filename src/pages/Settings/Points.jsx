@@ -15,19 +15,29 @@ import {
 
 const PointsSettingsPage = () => {
   const [rules, setRules] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
   const [thb, setThb] = useState(10);
   const [editingRule, setEditingRule] = useState(null);
 
   const rulesCollectionRef = collection(db, "pointRules");
+  const productsCollectionRef = collection(db, "products");
 
   useEffect(() => {
     const getRules = async () => {
       const data = await getDocs(rulesCollectionRef);
       setRules(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     };
+    const getCategories = async () => {
+      const data = await getDocs(productsCollectionRef);
+      const uniqueCategories = [
+        ...new Set(data.docs.map((doc) => doc.data().category)),
+      ];
+      setCategories(uniqueCategories);
+    };
     getRules();
-  }, []);
+    getCategories();
+  }, [productsCollectionRef, rulesCollectionRef]);
 
   const handleAddRule = async () => {
     if (category && thb > 0) {
@@ -95,13 +105,18 @@ const PointsSettingsPage = () => {
             {editingRule ? "แก้ไขกฎ" : "เพิ่มกฎใหม่"}
           </h2>
           <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
+            <select
               className="w-full px-4 py-3 bg-white/10 rounded-2xl placeholder-blue-300 text-white focus:outline-none focus:ring-2 focus:ring-cyan-300"
-              placeholder="ชื่อหมวดหมู่ (เช่น เครื่องดื่ม)"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-            />
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
             <div className="flex items-center gap-2">
               <input
                 type="number"

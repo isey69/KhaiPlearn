@@ -32,6 +32,16 @@ const SettingsPage = () => {
             title="ตั้งค่าการให้คะแนน"
             description="จัดการกฎการให้คะแนนสำหรับแต่ละหมวดหมู่"
           />
+          <SettingsLink
+            to="/settings/rewards"
+            title="ตั้งค่าของรางวัล"
+            description="จัดการรายการของรางวัลและแต้มที่ใช้แลก"
+          />
+          <SettingsLink
+            to="/settings/products"
+            title="ตั้งค่าสินค้า"
+            description="จัดการรายการสินค้าและราคา"
+          />
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ export const calculatePoints = async (items) => {
   return totalPoints;
 };
 
-export const recordSale = async (items, phone) => {
+export const recordSale = async (items, phone, paymentMethod) => {
   const totalAmount = items.reduce((sum, item) => sum + item.price, 0);
   const pointsEarned = await calculatePoints(items);
 
@@ -51,6 +51,7 @@ export const recordSale = async (items, phone) => {
       type: "sale",
       details: `ซื้อสินค้ารวม ${totalAmount} บาท`,
       points: pointsEarned,
+      paymentMethod,
       createdAt: new Date(),
     });
 
